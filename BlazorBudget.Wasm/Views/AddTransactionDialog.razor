@@ -1,0 +1,47 @@
+﻿@using BlazorBudget.Wasm.Abstractions
+@using BlazorBudget.Wasm.Store
+@using Fluxor
+@inject IState<CategoryState> CategoryState
+
+<MudDialog>
+    <DialogContent>
+        <MudForm>
+            <MudDatePicker Label="Date" @bind-Date="transaction.Date" />
+            <MudTextField Label="Description" @bind-Value="transaction.Description" />
+            <MudNumericField Label="Amount" @bind-Value="transaction.Amount" />
+            <MudSelect Label="Type" @bind-Value="transaction.Type">
+                <MudSelectItem Value="TransactionType.Income" Text="Income" />
+                <MudSelectItem Value="TransactionType.Expense" Text="Expense" />
+            </MudSelect>
+            <MudSelect Label="Category" @bind-Value="transaction.CategoryId">
+                @foreach (var category in CategoryState.Value.Categories)
+                {
+                    <MudSelectItem Value="@category.CategoryId" Text="@category.Name" />
+                }
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Submit">Add Transaction</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private Transaction transaction = new Transaction();
+
+    void Submit()
+    {
+        if (transaction.Amount > 0 && transaction.Date != null)
+        {
+            MudDialog.Close(DialogResult.Ok(transaction));
+        }
+        else
+        {
+            // Optionally show an error or validation message
+        }
+    }
+
+    void Cancel() => MudDialog.Close(DialogResult.Cancel());
+}

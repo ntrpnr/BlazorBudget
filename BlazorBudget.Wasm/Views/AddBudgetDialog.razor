@@ -1,0 +1,46 @@
+﻿@using BlazorBudget.Wasm.Abstractions
+@using BlazorBudget.Wasm.Store
+@using Fluxor
+@inject IState<BudgetState> BudgetState
+
+<MudDialog>
+    <DialogContent>
+        <MudForm>
+            <MudDatePicker Label="Budget Month"
+                @bind-Date="budget.Month"
+                IsDateDisabledFunc="IsDateDisabled"
+                OpenTo="OpenTo.Month"
+                FixDay="1"
+                DateFormat="MMM" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Submit">Create Budget</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private Budget budget = new Budget();
+
+    void Submit()
+    {
+        if (budget.Month != null)
+        {
+            MudDialog.Close(DialogResult.Ok(budget));
+        }
+        else
+        {
+            // Optionally show a notification or message
+        }
+    }
+
+    // If any of the user's budgets already exist for the selected month, disable the date
+    bool IsDateDisabled(DateTime date)
+    {
+        return BudgetState.Value.Budgets.Any(b => b.Month!.Value.Date.Year == date.Year && b.Month.Value.Month == date.Month);
+    }
+
+    void Cancel() => MudDialog.Close(DialogResult.Cancel());
+}

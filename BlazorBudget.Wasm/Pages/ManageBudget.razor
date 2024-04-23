@@ -1,0 +1,98 @@
+﻿@page "/manage-budget"
+@using BlazorBudget.Wasm.Abstractions
+@using BlazorBudget.Wasm.Store
+@using BlazorBudget.Wasm.Views
+@using Fluxor
+@using Fluxor.Blazor.Web.Components
+
+@inject IState<BudgetState> BudgetState
+@inject IDispatcher Dispatcher
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
+
+@inherits FluxorComponent
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="my-4">
+    <MudText Typo="Typo.h5">Manage Your Budgets</MudText>
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddBudget">
+        Add New Budget
+    </MudButton>
+
+    <MudPaper Class="mt-3 p-3">
+        @if (BudgetState.Value.IsLoading)
+        {
+            <MudProgressCircular Color="Color.Primary" />
+        }
+        else if (BudgetState.Value.Budgets != null && BudgetState.Value.Budgets.Any())
+        {
+            <MudTable Items="BudgetState.Value.Budgets" Striped="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh>Month</MudTh>
+                    <MudTh>Income</MudTh>
+                    <MudTh>Spent</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd> <MudLink OnClick="@(() => OpenBudgetDetails(context))">@context.Month?.ToString("MMM yyyy")</MudLink></MudTd>
+                    <MudTd>@context.IncomeAmount.ToString("C")</MudTd>
+                    <MudTd>@context.SpentAmount.ToString("C")</MudTd>
+                    <MudTd>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="@(() => EditBudget(context))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="@(() => DeleteBudget(context.BudgetId))" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        else
+        {
+            <MudText Typo="Typo.body1">No budgets found. Start by adding a new budget.</MudText>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Dispatcher.Dispatch(new FetchBudgetsAction { UserId = 1 }); // Example UserID, replace with actual when available
+        base.OnInitialized();
+    }
+
+    void OpenBudgetDetails(Budget budget)
+    {
+        NavigationManager.NavigateTo($"/budget-details/{budget.BudgetId}");
+    }
+
+
+    private void AddBudget()
+    {
+        var dialog = DialogService.Show<AddBudgetDialog>("Create New Budget");
+        var result = dialog.Result;
+
+        result.ContinueWith(result =>
+        {
+            if (!result.Result.Canceled)
+            {
+                var newBudget = (Budget)result.Result.Data;
+                Dispatcher.Dispatch(new AddOrUpdateBudgetAction { Budget = newBudget with { UserId = 1 } });
+            }
+        }, TaskScheduler.Current);
+    }
+
+
+    async Task CreateNewBudget(Budget newBudget)
+    {
+        var action = new AddOrUpdateBudgetAction { Budget = newBudget with { UserId = 1 } }; // Example UserID, replace with actual when available
+        Dispatcher.Dispatch(action);
+    }
+
+
+    void EditBudget(Budget budget)
+    {
+        // Navigate to a budget editing form or open a dialog for editing the selected budget
+    }
+
+    void DeleteBudget(Guid budgetId)
+    {
+        Dispatcher.Dispatch(new DeleteBudgetAction { UserId = 1, BudgetId = budgetId }); // Example UserID, replace with actual when available
+    }
+}

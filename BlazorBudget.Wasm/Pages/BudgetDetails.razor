@@ -1,0 +1,91 @@
+﻿@page "/budget-details/{BudgetId:guid}"
+@using BlazorBudget.Wasm.Abstractions
+@using BlazorBudget.Wasm.Store
+@using BlazorBudget.Wasm.Views
+@using Fluxor
+@using Fluxor.Blazor.Web.Components
+
+@inject IState<BudgetState> BudgetState
+@inject IDispatcher Dispatcher
+@inject IDialogService DialogService
+@inherits FluxorComponent
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="my-4">
+    <MudText Typo="Typo.h5">Budget Details for @budget?.Month?.ToString("MMMM yyyy")</MudText>
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddTransaction">
+        Add Transaction
+    </MudButton>
+
+    <MudPaper Class="mt-3 p-3">
+        @if (BudgetState.Value.IsLoading)
+        {
+            <MudProgressCircular Color="Color.Primary" />
+        }
+        else if (budget != null && budget.Transactions.Any())
+        {
+            <MudTable Items="budget.Transactions" Striped="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh>Date</MudTh>
+                    <MudTh>Description</MudTh>
+                    <MudTh>Amount</MudTh>
+                    <MudTh>Category</MudTh>
+                    <MudTh>Type</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Date?.ToString("dd MMM yyyy")</MudTd>
+                    <MudTd>@context.Description</MudTd>
+                    <MudTd>@context.Amount?.ToString("C")</MudTd>
+                    <MudTd>@categories.FirstOrDefault(c => c.CategoryId == context.CategoryId)?.Name</MudTd>
+                    <MudTd>@context.Type</MudTd>
+                    <MudTd>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="@(() => EditTransaction(context))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="@(() => DeleteTransaction(context.TransactionId))" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        else
+        {
+            <MudText Typo="Typo.body1">No transactions found. Start by adding a new transaction.</MudText>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public Guid BudgetId { get; set; }
+    private Budget budget => BudgetState.Value.Budgets.FirstOrDefault(b => b.BudgetId == BudgetId);
+    private List<Category> categories;
+
+    protected override void OnInitialized()
+    {
+        categories = new List<Category>(); // Assume categories are fetched or defined somewhere globally
+        base.OnInitialized();
+    }
+
+    private void AddTransaction()
+    {
+        var dialog = DialogService.Show<AddTransactionDialog>("Add Transaction");
+        var result = dialog.Result;
+
+        result.ContinueWith(task =>
+        {
+            if (!task.Result.Canceled)
+            {
+                var newTransaction = (Transaction)task.Result.Data;
+                Dispatcher.Dispatch(new AddOrUpdateBudgetAction { Budget = budget with { Transactions = budget.Transactions.Append(newTransaction).ToList() } });
+            }
+        }, TaskScheduler.Current);
+    }
+
+
+    private void EditTransaction(Transaction transaction)
+    {
+        // Code to open dialog and edit a transaction
+    }
+
+    private void DeleteTransaction(Guid transactionId)
+    {
+        // Code to dispatch an action to delete a transaction
+    }
+}
