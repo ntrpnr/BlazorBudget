@@ -16,7 +16,7 @@ public class BudgetFeature : Feature<BudgetState>
 // Budget State
 public record BudgetState
 {
-    public bool IsLoading { get; init; }
+    public bool IsLoading { get; init; } = true;
     public List<Budget> Budgets { get; init; }
     public string Error { get; init; }
 

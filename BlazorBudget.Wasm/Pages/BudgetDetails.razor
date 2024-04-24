@@ -1,13 +1,17 @@
 ﻿@page "/budget-details/{BudgetId:guid}"
 @using BlazorBudget.Wasm.Abstractions
+@using BlazorBudget.Wasm.Services
 @using BlazorBudget.Wasm.Store
 @using BlazorBudget.Wasm.Views
 @using Fluxor
 @using Fluxor.Blazor.Web.Components
 
 @inject IState<BudgetState> BudgetState
+@inject IState<CategoryState> CategoryState
+
 @inject IDispatcher Dispatcher
 @inject IDialogService DialogService
+@inject IColorService ColorService
 @inherits FluxorComponent
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="my-4">
@@ -36,7 +40,18 @@
                     <MudTd>@context.Date?.ToString("dd MMM yyyy")</MudTd>
                     <MudTd>@context.Description</MudTd>
                     <MudTd>@context.Amount?.ToString("C")</MudTd>
-                    <MudTd>@categories.FirstOrDefault(c => c.Id == context.Id)?.Name</MudTd>
+                    <MudTd>
+                        @if(CategoryState.Value.IsLoading)
+                        {
+                            <MudProgressCircular Color="Color.Primary" />
+                        }
+                        else
+                        {
+                            <MudChip Size="Size.Small" Color="Color.Primary" Style="@GetChipStyle(CategoryState.Value.Categories.FirstOrDefault(c => c.Id == context.CategoryId))">
+                                @CategoryState.Value.Categories.FirstOrDefault(c => c.Id == context.CategoryId)!.Name
+                            </MudChip>
+                        }                        
+                    </MudTd>
                     <MudTd>@context.Type</MudTd>
                     <MudTd>
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="@(() => EditTransaction(context))" />
@@ -55,11 +70,11 @@
 @code {
     [Parameter] public Guid BudgetId { get; set; }
     private Budget budget => BudgetState.Value.Budgets.FirstOrDefault(b => b.Id == BudgetId);
-    private List<Category> categories;
 
     protected override void OnInitialized()
     {
-        categories = new List<Category>(); // Assume categories are fetched or defined somewhere globally
+        Dispatcher.Dispatch(new FetchCategoriesAction { });
+        Dispatcher.Dispatch(new FetchBudgetsAction { UserId = 1 });
         base.OnInitialized();
     }
 
@@ -76,6 +91,16 @@
                 Dispatcher.Dispatch(new AddOrUpdateBudgetAction { Budget = budget with { Transactions = budget.Transactions.Append(newTransaction).ToList() } });
             }
         }, TaskScheduler.Current);
+    }
+
+    private string GetChipStyle(Category category)
+    {
+        if (category == null)
+        {
+            return string.Empty;
+        }
+        var textColor = ColorService.GetTextColor(category.Color);
+        return $"background-color: {category.Color}; color: {textColor}";
     }
 
 

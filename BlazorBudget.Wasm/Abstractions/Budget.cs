@@ -7,8 +7,8 @@ public record Budget
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public int UserId { get; set; }
-    public decimal IncomeAmount => Transactions.Count(t => t.Type == TransactionType.Income);
-    public decimal SpentAmount => Transactions.Count(t => t.Type == TransactionType.Expense);
+    public decimal? IncomeAmount => Transactions.Where(t => t.Type == TransactionType.Income).Sum(x => x.Amount);
+    public decimal? SpentAmount => Transactions.Where(t => t.Type == TransactionType.Expense).Sum(x => x.Amount);
     public DateTime? Month { get; set; }
     public List<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

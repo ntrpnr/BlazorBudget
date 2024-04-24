@@ -5,9 +5,9 @@ namespace BlazorBudget.Wasm.Services
 {
     public class ColorService : IColorService
     {
-        public string GetNewColor(IList<string> existingColors)
+        public List<string> GetColorList()
         {
-            var colors = new[]
+            return new List<string>
             {
                 "#FF6633", "#FFB399", "#FF33FF", "#FFFF99", "#00B3E6",
                 "#E6B333", "#3366E6", "#999966", "#99FF99", "#B34D4D",
@@ -20,6 +20,11 @@ namespace BlazorBudget.Wasm.Services
                 "#FF3380", "#CCCC00", "#66E64D", "#4D80CC", "#9900B3",
                 "#E64D66", "#4DB380", "#FF4D4D", "#99E6E6", "#6666FF"
             };
+        }
+
+        public string GetNewColor(IList<string> existingColors)
+        {
+            var colors = GetColorList();
 
             foreach (var color in colors)
             {
@@ -47,5 +52,7 @@ namespace BlazorBudget.Wasm.Services
     {
         public string GetNewColor(IList<string> existingColors);
         public string GetTextColor(string backgroundColor);
+
+        public List<string> GetColorList();
     }
 }

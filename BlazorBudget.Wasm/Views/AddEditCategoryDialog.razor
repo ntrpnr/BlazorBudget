@@ -9,7 +9,10 @@
     <DialogContent>
         <MudForm>
             <MudTextField @bind-Value="category.Name" Label="Category Name" />
-            <MudColorPicker Label="Basic Color Picker" @bind-Text="category.Color" Placeholder="Select Color" Style="@($"color: {category.Color};")" />
+            @if(category.Color != null)
+            {
+                <MudColorPicker Label="Basic Color Picker" @bind-Text="category.Color" Placeholder="Select Color" Style="@($"color: {category.Color};")" />
+            }            
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -25,6 +28,8 @@
     protected override async void OnInitialized()
     {
         category.Color = await CategoryService.GetNewCategoryColorAsync();
+        StateHasChanged();
+
         await base.OnInitializedAsync();
     }
 

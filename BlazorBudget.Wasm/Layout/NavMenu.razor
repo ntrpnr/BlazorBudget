@@ -1,6 +1,14 @@
 ﻿@using BlazorBudget.Wasm.Abstractions
 @using BlazorBudget.Wasm.Services
+@using BlazorBudget.Wasm.Store
+@using Fluxor
+@using Fluxor.Blazor.Web.Components
 @inject IBudgetService BudgetService
+@inject IDispatcher Dispatcher
+
+@inject IState<BudgetState> BudgetState
+
+@inherits FluxorComponent
 
 <MudPaper Width="250px" Class="py-3" Elevation="0">
     <MudNavMenu>
@@ -29,13 +37,11 @@
 </MudPaper>
 
 @code {
-
-    IList<Budget> _thisYearsBudgets = new List<Budget>();
+    IList<Budget> _thisYearsBudgets => BudgetState.Value.Budgets.Where(b => b.Month!.Value.Year == DateTime.Now.Year).OrderBy(b => b.Month).ToList();
 
     protected override async Task OnInitializedAsync()
     {
-        var budgets = await BudgetService.GetAllBudgetsAsync();
-        _thisYearsBudgets = budgets.Where(b => b.Month!.Value.Year == DateTime.Now.Year).ToList();
+        Dispatcher.Dispatch(new FetchBudgetsAction { UserId = 1 }); // Example UserID, replace with actual when available
 
         await base.OnInitializedAsync();
     }

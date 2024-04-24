@@ -18,7 +18,7 @@ public class CategoryFeature : Feature<CategoryState>
 
 public record CategoryState
 {
-    public bool IsLoading { get; init; }
+    public bool IsLoading { get; init; } = true;
     public List<Category> Categories { get; init; }
     public string Error { get; init; }
 

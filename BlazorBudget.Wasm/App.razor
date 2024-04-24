@@ -1,4 +1,7 @@
-﻿<Fluxor.Blazor.Web.StoreInitializer />
+﻿@using BlazorBudget.Wasm.Services
+@inject ICategoryService CategoryService
+
+<Fluxor.Blazor.Web.StoreInitializer />
 
 <PageTitle>BlazorBudget</PageTitle>
 
@@ -14,3 +17,11 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await CategoryService.SeedCategories();
+        await base.OnInitializedAsync();
+    }
+}

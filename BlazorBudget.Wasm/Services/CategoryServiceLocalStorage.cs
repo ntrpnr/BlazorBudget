@@ -67,4 +67,26 @@ public class CategoryServiceLocalStorage : ICategoryService
         var categories = await GetCategoriesAsync();
         return categories.Where(c => c.Type == type).ToList();
     }
+
+    public async Task SeedCategories()
+    {
+        var existingCategories = await GetCategoriesAsync();
+        if (existingCategories.Any())
+            return;
+
+        var colors = _colorService.GetColorList();
+
+        var categories = new List<Category>
+        {
+            new Category { Name = "Rent", Type = CategoryType.Fixed, Color = colors.Skip(0).FirstOrDefault(), },
+            new Category { Name = "Utilities", Type = CategoryType.Fixed, Color = colors.Skip(1).FirstOrDefault(), },
+            new Category { Name = "Groceries", Type = CategoryType.Variable, Color = colors.Skip(2).FirstOrDefault(), },
+            new Category { Name = "Gas", Type = CategoryType.Variable, Color = colors.Skip(3).FirstOrDefault(), },
+            new Category { Name = "Entertainment", Type = CategoryType.Variable, Color = colors.Skip(4).FirstOrDefault(), },
+            new Category { Name = "Clothing", Type = CategoryType.Variable, Color = colors.Skip(5).FirstOrDefault(), },
+            new Category { Name = "Miscellaneous", Type = CategoryType.Variable, Color = colors.Skip(6).FirstOrDefault(), },
+        };
+
+        await _localStorage.SetItemAsync(CategoryKey, categories);
+    }
 }

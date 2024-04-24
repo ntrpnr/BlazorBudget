@@ -16,4 +16,6 @@ public interface ICategoryService
     Task DeleteCategoryAsync(Guid categoryId);
 
     Task<List<Category>> GetCategoriesByTypeAsync(CategoryType type);
+
+    Task SeedCategories();
 }
