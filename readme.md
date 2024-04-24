@@ -35,3 +35,6 @@ Open the `BudgetServiceTests.cs` file and make sure that all the tests are passi
 1. Optional: Try to implement the remove category functionality.
 1. Try to implement the Edit transaction functionality. Most of the code is already in place. 					
 1. Find some other functionality that you would like to implement and see if Copilot can help you with that.
+
+#### Visuals
+1. See if you can use Copilot to improve the visuals of the application. Add containers and other MudBlazor components to make the application look better.
