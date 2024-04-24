@@ -13,7 +13,7 @@ public class BudgetServiceLocalStorage : IBudgetService
     private readonly ILocalStorageService _localStorage;
     private readonly ICategoryService _categoryService;
 
-    private const string BudgetKey = "budget";
+    public const string BudgetKey = "budget";
 
     public BudgetServiceLocalStorage(ILocalStorageService localStorage, ICategoryService categoryService)
     {
