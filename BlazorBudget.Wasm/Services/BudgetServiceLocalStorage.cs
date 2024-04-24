@@ -24,10 +24,9 @@ public class BudgetServiceLocalStorage : IBudgetService
     public async Task<bool> CreateOrUpdateBudgetAsync(Budget budget)
     {
         var budgets = await GetBudgetsByUserIdAsync(budget.UserId);
-        var existingBudget = budgets.FirstOrDefault(b => b.BudgetId == budget.BudgetId);
+        var existingBudget = budgets.FirstOrDefault(b => b.Id == budget.Id);
         if (existingBudget == null)
         {
-            budget.BudgetId = Guid.NewGuid();
             budgets.Add(budget);
         }
         else
@@ -43,7 +42,7 @@ public class BudgetServiceLocalStorage : IBudgetService
     public async Task<bool> DeleteBudgetAsync(Guid budgetId)
     {
         var budgets = await GetAllBudgetsAsync();
-        var budget = budgets.FirstOrDefault(b => b.BudgetId == budgetId);
+        var budget = budgets.FirstOrDefault(b => b.Id == budgetId);
         if (budget == null)
             return false;
 
@@ -65,10 +64,10 @@ public class BudgetServiceLocalStorage : IBudgetService
     public async Task<Budget> GetBudgetByIdAsync(Guid budgetId)
     {
         var budgets = await GetAllBudgetsAsync();
-        return budgets.FirstOrDefault(b => b.BudgetId == budgetId);
+        return budgets.FirstOrDefault(b => b.Id == budgetId);
     }
 
-    public async Task<List<Transaction>> GetTransactionsByCategoryBudgetIdAsync(int categoryBudgetId)
+    public async Task<List<Transaction>> GetTransactionsByCategoryBudgetIdAsync(Guid categoryBudgetId)
     {
         var budgets = await GetAllBudgetsAsync();
         return budgets.SelectMany(b => b.Transactions).Where(t => t.CategoryId == categoryBudgetId).ToList();

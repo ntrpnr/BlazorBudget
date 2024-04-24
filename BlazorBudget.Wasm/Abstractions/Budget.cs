@@ -3,16 +3,9 @@ using System.Transactions;
 
 namespace BlazorBudget.Wasm.Abstractions;
 
-public record Category
-{
-    public int CategoryId { get; set; }
-    public string? Name { get; set; }
-    public CategoryType Type { get; set; }
-}
-
 public record Budget
 {
-    public Guid BudgetId { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.NewGuid();
     public int UserId { get; set; }
     public decimal IncomeAmount => Transactions.Count(t => t.Type == TransactionType.Income);
     public decimal SpentAmount => Transactions.Count(t => t.Type == TransactionType.Expense);
@@ -22,12 +15,12 @@ public record Budget
 
 public class Transaction
 {
-    public Guid TransactionId { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.NewGuid();
     public DateTime? Date { get; set; }
     public string? Description { get; set; }
     public decimal? Amount { get; set; }
     public TransactionType Type { get; set; }
-    public int CategoryId { get; set; }
+    public Guid? CategoryId { get; set; }
 }
 
 public enum TransactionType

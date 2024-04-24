@@ -13,5 +13,5 @@ public interface IBudgetService
 
     Task<Budget> GetBudgetByIdAsync(Guid budgetId);
 
-    Task<List<Transaction>> GetTransactionsByCategoryBudgetIdAsync(int categoryBudgetId);
+    Task<List<Transaction>> GetTransactionsByCategoryBudgetIdAsync(Guid categoryBudgetId);
 }

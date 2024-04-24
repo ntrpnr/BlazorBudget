@@ -36,11 +36,11 @@
                     <MudTd>@context.Date?.ToString("dd MMM yyyy")</MudTd>
                     <MudTd>@context.Description</MudTd>
                     <MudTd>@context.Amount?.ToString("C")</MudTd>
-                    <MudTd>@categories.FirstOrDefault(c => c.CategoryId == context.CategoryId)?.Name</MudTd>
+                    <MudTd>@categories.FirstOrDefault(c => c.Id == context.Id)?.Name</MudTd>
                     <MudTd>@context.Type</MudTd>
                     <MudTd>
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="@(() => EditTransaction(context))" />
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="@(() => DeleteTransaction(context.TransactionId))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="@(() => DeleteTransaction(context.Id))" />
                     </MudTd>
                 </RowTemplate>
             </MudTable>
@@ -54,7 +54,7 @@
 
 @code {
     [Parameter] public Guid BudgetId { get; set; }
-    private Budget budget => BudgetState.Value.Budgets.FirstOrDefault(b => b.BudgetId == BudgetId);
+    private Budget budget => BudgetState.Value.Budgets.FirstOrDefault(b => b.Id == BudgetId);
     private List<Category> categories;
 
     protected override void OnInitialized()
@@ -65,7 +65,7 @@
 
     private void AddTransaction()
     {
-        var dialog = DialogService.Show<AddTransactionDialog>("Add Transaction");
+        var dialog = DialogService.Show<AddEditTransactionDialog>("Add Transaction");
         var result = dialog.Result;
 
         result.ContinueWith(task =>

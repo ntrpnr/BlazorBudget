@@ -1,4 +1,5 @@
 ﻿using BlazorBudget.Wasm.Abstractions;
+using System.Runtime.CompilerServices;
 
 namespace BlazorBudget.Wasm.Services;
 
@@ -6,13 +7,13 @@ public interface ICategoryService
 {
     Task<List<Category>> GetCategoriesAsync();
 
-    Task<Category> GetCategoryByIdAsync(int categoryId);
+    Task<Category> GetCategoryByIdAsync(Guid categoryId);
 
-    Task CreateCategoryAsync(Category category);
+    Task<string> GetNewCategoryColorAsync();
 
-    Task UpdateCategoryAsync(Category category);
+    Task CreateOrUpdateCategoryAsync(Category category);
 
-    Task DeleteCategoryAsync(int categoryId);
+    Task DeleteCategoryAsync(Guid categoryId);
 
     Task<List<Category>> GetCategoriesByTypeAsync(CategoryType type);
 }

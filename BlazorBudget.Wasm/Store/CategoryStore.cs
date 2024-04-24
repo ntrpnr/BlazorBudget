@@ -33,7 +33,7 @@ public record FetchCategoriesSuccessAction { public List<Category> Categories { 
 public record FetchCategoriesFailureAction { public string Error { get; init; } }
 
 public record AddOrUpdateCategoryAction { public Category Category { get; init; } }
-public record DeleteCategoryAction { public int CategoryId { get; init; } }
+public record DeleteCategoryAction { public Guid? CategoryId { get; init; } }
 
 // Reducers
 
@@ -68,6 +68,20 @@ public class CategoryEffects
         {
             var categories = await _categoryService.GetCategoriesAsync();
             dispatcher.Dispatch(new FetchCategoriesSuccessAction { Categories = categories });
+        }
+        catch (Exception ex)
+        {
+            dispatcher.Dispatch(new FetchCategoriesFailureAction { Error = ex.Message });
+        }
+    }
+
+    [EffectMethod]
+    public async Task HandleAddOrUpdateCategory(AddOrUpdateCategoryAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _categoryService.CreateOrUpdateCategoryAsync(action.Category);
+            dispatcher.Dispatch(new FetchCategoriesAction());
         }
         catch (Exception ex)
         {

@@ -14,6 +14,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddMudServices();
 builder.Services.AddScoped<IBudgetService, BudgetServiceLocalStorage>();
 builder.Services.AddScoped<ICategoryService, CategoryServiceLocalStorage>();
+builder.Services.AddSingleton<IColorService, ColorService>();
 builder.Services.AddScoped<BudgetEffects>();
 
 builder.Services.AddBlazoredLocalStorage();

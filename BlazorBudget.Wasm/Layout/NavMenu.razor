@@ -1,15 +1,47 @@
-﻿<MudPaper Width="250px" Class="py-3" Elevation="0">
+﻿@using BlazorBudget.Wasm.Abstractions
+@using BlazorBudget.Wasm.Services
+@inject IBudgetService BudgetService
+
+<MudPaper Width="250px" Class="py-3" Elevation="0">
     <MudNavMenu>
         <MudText Typo="Typo.h6" Class="px-4">BlazorBudget</MudText>
         <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Budget in a Blaze and Amaze</MudText>
         <MudDivider Class="my-2" />
         <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-        <MudNavLink Href="/manage-budget" Icon="@Icons.Material.Filled.AccountBalanceWallet">Manage Budget</MudNavLink>
+        <MudNavLink Href="/manage-budget" Icon="@Icons.Material.Filled.AccountBalanceWallet">Manage Budgets</MudNavLink>
+        <MudNavGroup Title="@DateTime.Now.Year.ToString()" Icon="@Icons.Material.Filled.CalendarMonth" Expanded="true">
+            @foreach (var budget in _thisYearsBudgets)
+            {
+                <MudNavLink Href="@GetBudgetLink(budget)">@budget.Month?.ToString("MMM")</MudNavLink>
+            }
+        </MudNavGroup>
         <MudNavLink Href="/follow-up" Disabled="true" Icon="@Icons.Material.Filled.Timeline">Follow Up</MudNavLink>
         <MudNavGroup Title="Archive" Icon="@Icons.Material.Filled.Archive" Expanded="true" Disabled="true">
-            <MudNavLink Href="/archive/previous-months" Disabled="true">Previous Months</MudNavLink>
+            <MudNavLink Href="/archive/previous-years" Disabled="true">Previous Years</MudNavLink>
             <MudNavLink Href="/archive/expense-history" Disabled="true">Expense History</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Settings" Icon="@Icons.Material.Filled.Settings" Expanded="true">
+            <MudNavLink Href="/transaction-categories" Icon="@Icons.Material.Filled.Category">Transaction Categories</MudNavLink>
+            <MudNavLink Href="/manage-users" Icon="@Icons.Material.Filled.People" Disabled="true">Manage Users</MudNavLink>
         </MudNavGroup>
         <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
     </MudNavMenu>
 </MudPaper>
+
+@code {
+
+    IList<Budget> _thisYearsBudgets = new List<Budget>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var budgets = await BudgetService.GetAllBudgetsAsync();
+        _thisYearsBudgets = budgets.Where(b => b.Month!.Value.Year == DateTime.Now.Year).ToList();
+
+        await base.OnInitializedAsync();
+    }
+
+    private string GetBudgetLink(Budget budget)
+    {
+        return $"/budget-details/{budget.Id}";
+    }
+}

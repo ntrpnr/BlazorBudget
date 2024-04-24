@@ -1,0 +1,44 @@
+﻿@using BlazorBudget.Wasm.Abstractions
+@using BlazorBudget.Wasm.Services
+@using BlazorBudget.Wasm.Store
+@using Fluxor
+@inject IState<CategoryState> CategoryState
+@inject ICategoryService CategoryService
+
+<MudDialog>
+    <DialogContent>
+        <MudForm>
+            <MudTextField @bind-Value="category.Name" Label="Category Name" />
+            <MudColorPicker Label="Basic Color Picker" @bind-Text="category.Color" Placeholder="Select Color" Style="@($"color: {category.Color};")" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Submit">Add Category</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private Category category = new Category();
+
+    protected override async void OnInitialized()
+    {
+        category.Color = await CategoryService.GetNewCategoryColorAsync();
+        await base.OnInitializedAsync();
+    }
+
+    void Submit()
+    {
+        if (!string.IsNullOrEmpty(category.Name))
+        {
+            MudDialog.Close(DialogResult.Ok(category));
+        }
+        else
+        {
+            // Optionally show an error or validation message
+        }
+    }
+
+    void Cancel() => MudDialog.Close(DialogResult.Cancel());
+}

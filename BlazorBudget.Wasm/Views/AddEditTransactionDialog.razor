@@ -1,7 +1,10 @@
 ﻿@using BlazorBudget.Wasm.Abstractions
+@using BlazorBudget.Wasm.Services
 @using BlazorBudget.Wasm.Store
 @using Fluxor
 @inject IState<CategoryState> CategoryState
+@inject IDispatcher Dispatcher
+@inject IColorService ColorService
 
 <MudDialog>
     <DialogContent>
@@ -13,10 +16,12 @@
                 <MudSelectItem Value="TransactionType.Income" Text="Income" />
                 <MudSelectItem Value="TransactionType.Expense" Text="Expense" />
             </MudSelect>
-            <MudSelect Label="Category" @bind-Value="transaction.CategoryId">
+            <MudSelect T="Guid?" Label="Category" @bind-Value="transaction.CategoryId" >
                 @foreach (var category in CategoryState.Value.Categories)
                 {
-                    <MudSelectItem Value="@category.CategoryId" Text="@category.Name" />
+                    <MudSelectItem T="Guid?" Value="@category.Id">
+                        <MudChip Size="Size.Small" Color="Color.Primary" Style="@GetChipStyle(category)">@category.Name</MudChip>
+                    </MudSelectItem>
                 }
             </MudSelect>
         </MudForm>
@@ -31,6 +36,12 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     private Transaction transaction = new Transaction();
 
+    protected override async void OnInitialized()
+    {
+        Dispatcher.Dispatch(new FetchCategoriesAction());
+        await base.OnInitializedAsync();
+    }
+
     void Submit()
     {
         if (transaction.Amount > 0 && transaction.Date != null)
@@ -41,6 +52,12 @@
         {
             // Optionally show an error or validation message
         }
+    }
+
+    string GetChipStyle(Category category)
+    {
+        var textColor = ColorService.GetTextColor(category.Color);
+        return $"background-color: {category.Color}; color: {textColor}";
     }
 
     void Cancel() => MudDialog.Close(DialogResult.Cancel());
