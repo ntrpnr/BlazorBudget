@@ -18,14 +18,14 @@ The purpose of this project is to have a simple front-end application that can b
 #### Unit tests
 Open the `BudgetServiceTests.cs` file and make sure that all the tests are passing.
 
-1. Add a new test called `GetBudgetsByUserIdAsync_LocalStorageReturnsNull()` and see if Copilot can help you write the full test. The service should return an empty list.
+1. Add a new test called `GetBudgetsByUserIdAsync_LocalStorageReturnsNull_ReturnsEmptyList()` and see if Copilot can help you write the full test.
 1. Come up with a new test scenario and see if Copilot can help you write the test.
 
 #### Components
 1. Open the Home.razor file
 1. Add this comment on top of the page:
 `
-@* This page has some nice overview of the budgets and transactions. It has MudCards with elevation 2 where you can see the income and spending for the each month. If there are no budgets let the user know. Inherit from FluxorComponent. *@
+@* This page has some nice overview of the budgets and transactions. It has MudCards with elevation 2 where you can see the income and spending for each month. If there are no budgets let the user know. Inherit from FluxorComponent. *@
 `
 1. Press enter a few times and see if Copilot can help you write the full page. You might need to add some using statements and references to the MudBlazor components.
 1. There might be missing content at the bottom of the page. Put the cursor there and press enter to generate more code.  
